@@ -1,0 +1,45 @@
+<table id="dg" title="Usuários" class="easyui-datagrid" style="width:750px;height:300px"  
+        url="#URL#code/Datatable/get_users"  
+        toolbar="#toolbar"  
+        rownumbers="true" fitColumns="true" singleSelect="true">  
+    <thead>  
+        <tr>  
+            <th field="id" width="50">ID</th>  
+            <th field="nome" width="50">Name</th>  
+            <th field="email" width="50">E-Mail</th>  
+            <th field="type" width="50">Type</th>  
+        </tr>  
+    </thead>  
+</table>  
+<div id="toolbar">  
+    <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser()">Insert</a>  
+    <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()">Edit</a>  
+    <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="removeUser()">Delete</a>  
+</div>  
+
+<div id="dlg" class="easyui-dialog" style="width:400px;height:280px;padding:10px 20px"  
+        closed="true" buttons="#dlg-buttons">  
+    <div class="ftitle">User profile</div>  
+    <form id="fm" method="post">  
+        <div class="fitem">  
+            <label>Name:</label>  
+            <input name="nome" class="easyui-validatebox" required="true">  
+        </div>  
+        <div class="fitem">  
+            <label>E-Mail:</label>  
+            <input name="email" class="easyui-validatebox" required="true">  
+        </div>  
+        <div class="fitem">  
+            <label>Type:</label>  
+            <input name="type">  
+        </div>  
+        <div class="fitem">  
+            <label>Status:</label>  
+            <input name="status">  
+        </div>  
+    </form>  
+</div>  
+<div id="dlg-buttons">  
+    <a href="#" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveUser()">Save</a>  
+    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">Cancel</a>  
+</div>
