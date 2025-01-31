@@ -54,4 +54,4 @@ define('POS_MODULE',2);
 define('TEMPLATE', PATH_HTML.'template.html');
 
 //Define Layout Structure
-Session::setValue( 'LAYOUT',array( 'Header' => '#HEADER#','Footer' => '#FOOTER#' ) );
+Session::setValue( 'LAYOUT',array( 'Header' => '#HEADER#','Menu'=>'#MENU#','Footer' => '#FOOTER#' ) );
