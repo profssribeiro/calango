@@ -1,4 +1,4 @@
-![Alt text](https://github.com/profssribeiro/calango/tree/master/public/img/banner.png)
+![Banner](public/img/banner.png)
 
 # Calango PHP Framework
 
