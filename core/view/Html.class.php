@@ -12,6 +12,9 @@ Class Html{
     private static $inc_values=array();
     private static $chk_values=array();
     private static $where='';
+    private static $data=array();
+    private static $rpp=10;
+    private static $p1=1;
     
     public static function setPage( $html_page ){
         self::$html_page = $html_page;
@@ -43,17 +46,31 @@ Class Html{
     public static function setWhere( $where ){
         self::$where = $where;
     }
+    public static function setRpp( $rpp ){
+        self::$rpp = $rpp;
+    }
+    public static function setP1( $p1 ){
+        self::$p1 = $p1;
+    }
+    public static function getData(){
+        return self::$data;
+    }
+
     public static function generate(){
         $html        = self::load( self::$html_page);
-        $html_head   = mb_substr( $html,0,strpos(strtoupper($html),'<TBODY>'));
-        $body        = mb_substr( $html,strpos(strtoupper($html),'<TBODY>')+8,(strpos(strtoupper($html),'</TBODY>')-strpos(strtoupper($html),'<TBODY>'))-8);
+        $html_head   = mb_substr( $html,0,strpos(strtoupper($html),'<TBODY>')-2);
+        $sub_body    = mb_substr( $html,strpos(strtoupper($html),'<TBODY>')+6);
+        $body        = mb_substr($sub_body,0,strpos(strtoupper($sub_body),'</TBODY>'));
         $html_body   = '';
-        $html_footer = mb_substr( $html,strpos(strtoupper($html),'</TBODY>')+8);
+        $html_footer = mb_substr( $html,strpos(strtoupper($html),'</TBODY>')+7);
         $where       = '';
         $filtro      = '';
-        $flt_name    = 'flt_'.App::$modulo;
-        $ordem       = !empty(App::$ordem) ? App::$ordem : self::$filters[0];
-        
+        $flt_name    = 'flt_'.App::$module;
+        $order       = !empty(App::$order) ? App::$order : self::$filters[0];
+        $rpp         = self::$rpp;
+
+        //die(gettype($rpp).'>'.$pagination['RPP']);
+
         //Defining Filters e Orders
         if(isset($_POST['filter'])):
             Session::setValue($flt_name,$_POST['filter']);
@@ -62,38 +79,46 @@ Class Html{
         if(Session::getValue($flt_name)):
             $filtro   = Session::getValue($flt_name);
             if(self::$where)
-                $where = ' where ( '.self::$where.' ) and ';
+                $where = ' where ( '.self::$where.' ) and (';
             else
-                $where = ' where '; 
+                $where = ' where ('; 
     
             $operador = '';
             foreach( self::$filters as $field ):
                 $where .= $operador.$field." like '%".$filtro."%'";
                 $operador = ' or ';
             endforeach;
+            $where.=')';
         else:
             if(self::$where)
                 $where = ' where '.self::$where;
         endif;
         
         $html_head   = str_replace('#FILTER#',$filtro,$html_head);
-        $html_head   = str_replace('#OPTION#',Html::option( self::$orders,$ordem ),$html_head);
+        $html_head   = str_replace('#OPTION#',Html::option( self::$orders,$order ),$html_head);
         
-        $sql = self::$select.$where." order by ".$ordem;
+        $sql = self::$select.$where." order by ".$order;
 
-        //Paginação
+        //Pagination
         $total       = count( R::getAll( $sql ) );
-        $pagination   = Html::pagination(URL.App::$modulo.'/show/'.App::$key.'/'.App::$ordem,App::$page,$total,RPP);
-        $offset      = (RPP*(App::$page-1));
+        $pagination  = Html::pagination(URL.App::$module.'/show/'.App::$key.'/'.App::$order,App::$page,$total,$rpp);
+        $offset      = ($rpp*(App::$page-1));
         $ofsset      = $offset>$total ? 0 : $offset;
 
-        $html_footer = str_replace('#PAGINATION#',$pagination,$html_footer);
+        $paginas = ceil( $total / $rpp );
+
+        $s_pagination = self::setPagData($s_pagination, $paginas);
+
+        $html_footer = self::setPagination($html_footer,App::$page,$paginas);
+
+        //$html_footer = str_replace('#PAGINATION#',$pagination,$html_footer);
 
         //Registers
         
-        $sql .= " LIMIT ".RPP." OFFSET ".$offset;
+        $sql .= " LIMIT ".$rpp." OFFSET ".$offset;
         
-        $regs = R::getAll( $sql ); 
+        $regs = R::getAll( $sql );
+        self::$data = $regs; 
 
         foreach( $regs as $reg):
             $new_body = $body;
@@ -110,7 +135,7 @@ Class Html{
     }
     public static function form_generate(){
 
-        $html = self::load( self::$html_page);
+        $html = self::load(self::$html_page);
         
         if(self::$action=='update' or App::$action=='update'):
             $html = str_replace( '#ACTION#',self::$url.'/'.App::$key,$html);
@@ -168,33 +193,24 @@ Class Html{
     }
 
     public static function pagination( $url,$page,$total,$rowbypg ){
-        
-        $html = '<ul>';
-        
-        if($page==1):
-            $html .= '<li class="disabled"><a>&laquo;</a></li>';
-        else:
-            $html .= '<li><a href="'.$url.'">&laquo;</a></li>';
-        endif;
-        
-        
+      
+        $html = '<select name="selectURL" class="form-select form-select-sm" onchange="window.open(document.nav.selectURL.options[document.nav.selectURL.selectedIndex].value,\'_self\')">';
+
         for( $count=1;$count <= ceil($total/$rowbypg);$count++ ):
             if($count==$page):
-                $html .= '<li class="active"><a class="disabled">'.$count.'</a></li>';
+                $html.='<option value="'.$url.'/'.$count.'" selected> Pag '.$count.'</option>';
             else:
-                $html .= '<li><a href="'.$url.'/'.$count.'">'.$count.'</a></li>';
+                $html.='<option value="'.$url.'/'.$count.'" > Pag '.$count.'</option>';
             endif;
         endfor;
 
-        if($page==ceil($total/$rowbypg)):
-            $html .= '<li class="disabled"><a>&raquo;</a></li></ul>';
-        else:
-            $html .= '<li><a href="'.$url.'">&raquo;</a></li></ul>';
-        endif;
+        $html .= '</select>';
+
 
         return $html;
     }
     public static function set_markers( $html ){
+		$pagination = Session::getValue( 'pagination' );
         $html = str_replace('#URL#'      ,URL            ,$html);
         $html = str_replace('#MODULE#'   ,App::$module   ,$html);
         $html = str_replace('#ACTION#'   ,App::$action   ,$html);
@@ -202,7 +218,61 @@ Class Html{
         $html = str_replace('#KEY_CHILD#',App::$key_child,$html);
         $html = str_replace('#ORDER#'    ,App::$order    ,$html);
         $html = str_replace('#PAGE#'     ,App::$page     ,$html);
+        $html = str_replace('#RPP#'      ,self::$rpp     ,$html);
         return $html;
+    }
+    public static function setPagination($html_footer,$page,$paginas){
+        $pagination = Session::getValue(App::$module);
+        $page=intval($page);
+
+        $pg = self::$p1;
+
+        if($pg==1):
+            $html_footer = str_replace('#E-STATUS#' ,'disabled',$html_footer);
+        else:
+            $html_footer = str_replace('#E-STATUS#' ,'',$html_footer);
+        endif;
+        if($paginas<=10):
+            $html_footer = str_replace('#E-HIDDEN#' ,'hidden',$html_footer);
+            $html_footer = str_replace('#D-HIDDEN#' ,'hidden',$html_footer);
+        else:
+            $html_footer = str_replace('#E-HIDDEN#' ,'',$html_footer);
+            $html_footer = str_replace('#D-HIDDEN#' ,'',$html_footer);
+        endif;
+
+        for( $p=1; $p<=10; $p++ ):
+            
+            $status = $pg == $page  ? 'active' : '';
+            $hidden = $p > $paginas ? 'hidden' : '';
+
+            $html_footer = str_replace('#P'.$p.'-STATUS#',$status,$html_footer);
+            $html_footer = str_replace('#P'.$p.'-HIDDEN#',$hidden,$html_footer);
+            $html_footer = str_replace('#P'.$p.'#'       ,$pg    ,$html_footer);
+            $pg++;
+
+        endfor;
+
+        if($pg>$paginas):
+            $html_footer = str_replace('#D-STATUS#' ,'disabled',$html_footer);
+        else:
+            $html_footer = str_replace('#D-STATUS#' ,'',$html_footer);
+            $html_footer = str_replace('#D-HIDDEN#' ,'',$html_footer);
+        endif;
+        return $html_footer;
+    }
+    public static function setPagData($pagination, $paginas){
+        if($pagination['PGS']<>$paginas):
+            $pagination['PGS'] = $paginas;
+            $pagination['EA'] = 1;
+            $pagination['EB'] = $paginas>1 ? 2 : 0;
+            $pagination['M']  = $paginas>2 ? 3 : 0;
+            $pagination['DA'] = $paginas>3 ? 4 : 0;
+            $pagination['DB'] = $paginas>4 ? 5 : 0;
+            $pagination['D']  = $paginas>5 ? 6 : 0;
+            Session::setValue( 'pagination',$pagination );
+        endif;
+        //die(var_dump($pagination).'<br>'.$paginas);
+        return $pagination;
     }
 }
 

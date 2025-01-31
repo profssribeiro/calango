@@ -5,7 +5,7 @@ Class App{
     public static $module;
     public static $action;
     public static $key;
-    public static $key_child;
+    public static $key_child='';
     public static $order;
     public static $page;
     
@@ -13,7 +13,7 @@ Class App{
         
         $site='';
         
-        //Database acess
+        //Database access
         $geturl = array_filter(explode('/', $_SERVER['REQUEST_URI']));
 
         self::$module = isset($geturl[POS_MODULE])   ? $geturl[POS_MODULE]   : 'Main'   ;

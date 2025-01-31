@@ -17,6 +17,8 @@ class Session
         if (isset($_SESSION[$variavel]))
         {
             return $_SESSION[$variavel];
+        }else{
+            return false;
         }
     }
 

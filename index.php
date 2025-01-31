@@ -3,11 +3,11 @@
 /** 
  * MAIN PROGRAM FOR SYSTEM INITIALIZATION
  * 
- * @author Sergio Ribeiro <professor@sergioribeiro.com.br> 
- * @version 1.0 
- * @copyright LGPLv3 � 2012. 
+ * @author Sergio Ribeiro <profssribeiro@gmail.com> 
+ * @version 2.0 
+ * @copyright LGPLv3 (c) 2012. 
  * @package Calango Framework 
- * @link http://calango.sergioribeiro.com.br
+ * @link https://github.com/profssribeiro/calango
  *
  * @access public
  * @name index.php 
@@ -25,21 +25,21 @@
  * @return null
  *
  */ 
-function __autoload($class){
+function autoload($className)
+{
     $folders = array('core/controller','core/model','core/view','core/plugin','controller','model','view','plugin');
     foreach($folders as $folder){
-        if(file_exists( "{$folder}/{$class}.class.php" )){
-            if(!class_exists($class)):
-                include_once "{$folder}/{$class}.class.php";
-            endif;
+        if(file_exists( "{$folder}/{$className}.class.php" )){
+            require_once("{$folder}/{$className}.class.php");
         }
     }
 }
+spl_autoload_register('autoload');
 
 //Loading configurations
 require_once("config/config.php");
 
-//Running the main class ( Controller )
+//Running the main class (Controller)
 ob_start();
 $app = new App;
 $html = $app->run();

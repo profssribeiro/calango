@@ -3,11 +3,11 @@
 /** 
  * SYSTEM PROGRAM CONFIGURATION
  * 
- * @author Sergio Ribeiro <professor@sergioribeiro.com.br> 
- * @version 1.0 
+ * @author Sergio Ribeiro <profssribeiro@gmail.com> 
+ * @version 2.0 
  * @copyright LGPLv3 (c) 2012. 
  * @package Calango Framework 
- * @link http://calango.sergioribeiro.com.br
+ * @link https://github.com/profssribeiro/calango
  *
  * @access public
  * @name config.php 
@@ -27,7 +27,7 @@ ini_set('display_errors',true);
 define('URL','http://'.$_SERVER['HTTP_HOST'].'/calango/');
 define('DS', DIRECTORY_SEPARATOR);
 define('PATH', getcwd().DS );
-define('PATH_IMG',$_SERVER['DOCUMENT_ROOT'].'/calango/public/img_loja/');
+define('PATH_IMG',$_SERVER['DOCUMENT_ROOT'].'/calango/public/img/');
 define('PATH_HTML',PATH.'view'.DS.'html'.DS);
 
 //Application SMTP and E-Mail 
