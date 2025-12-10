@@ -6,4 +6,4 @@ This framework is designed to be simple and easy to implement. It is a framework
 
 # How to cite
 
-Ribeiro, S. R. (2025). PHP Calango framework and digital transformation: An introductory guide for beginners. _Iberoamerican Journal of Applied Computing_,  13(1). [Available at:] (https://revistas.uepg.br/index.php/ijac/article/view/24848)
+Ribeiro, S. S. (2025). PHP Calango framework and digital transformation: An introductory guide for beginners. _Iberoamerican Journal of Applied Computing_,  13(1). [Available at:] (https://revistas.uepg.br/index.php/ijac/article/view/24848)
